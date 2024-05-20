@@ -346,7 +346,7 @@ public class ConsumeAMQP extends AbstractAMQPProcessor<AMQPConsumer> {
             this.description = description;
         }
 
-        public static EnumSet<OutputHeaderFormat> getAllowedValues(){
+        public static EnumSet<OutputHeaderFormat> getAllowedValues() {
             return EnumSet.of(COMMA_SEPARATED_STRING, JSON_STRING, ATTRIBUTES);
         }
 

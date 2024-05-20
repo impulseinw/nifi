@@ -112,7 +112,7 @@ public class PublishAMQP extends AbstractAMQPProcessor<AMQPPublisher> {
             .description(
                     "In case of key duplication in header sources, this defines which value to take.")
             .required(true)
-            .dependsOn(HEADERS_SOURCE,InputHeaderSource.BOTH)
+            .dependsOn(HEADERS_SOURCE, InputHeaderSource.BOTH)
             .allowableValues(InputHeaderSource.STRING, InputHeaderSource.ATTRIBUTES)
             .defaultValue(InputHeaderSource.STRING)
             .build();
@@ -304,16 +304,16 @@ public class PublishAMQP extends AbstractAMQPProcessor<AMQPPublisher> {
     private Map<String, Object> prepareAMQPHeaders(FlowFile flowFile, String selectedHeaderSource, String headerSourcePrecedence, Character headerSeparator, Pattern pattern) {
         final Map<String, Object> headers = new HashMap<>();
         if (InputHeaderSource.ATTRIBUTES.getValue().equals(selectedHeaderSource)) {
-                headers.putAll(attributesToHeaders(flowFile.getAttributes(),pattern));
+                headers.putAll(attributesToHeaders(flowFile.getAttributes(), pattern));
         } else if (InputHeaderSource.STRING.getValue().equals(selectedHeaderSource)) {
             readAmqpAttribute(flowFile, AbstractAMQPProcessor.AMQP_HEADERS_ATTRIBUTE, value -> headers.putAll(validateAMQPHeaderProperty(value, headerSeparator)));
         } else {
             // When precedence matches, put values in the last so it can override keys from other source
             if (InputHeaderSource.ATTRIBUTES.getValue().equals(headerSourcePrecedence)) {
                 readAmqpAttribute(flowFile, AbstractAMQPProcessor.AMQP_HEADERS_ATTRIBUTE, value -> headers.putAll(validateAMQPHeaderProperty(value, headerSeparator)));
-                headers.putAll(attributesToHeaders(flowFile.getAttributes(),pattern));
+                headers.putAll(attributesToHeaders(flowFile.getAttributes(), pattern));
             } else {
-                headers.putAll(attributesToHeaders(flowFile.getAttributes(),pattern));
+                headers.putAll(attributesToHeaders(flowFile.getAttributes(), pattern));
                 readAmqpAttribute(flowFile, AbstractAMQPProcessor.AMQP_HEADERS_ATTRIBUTE, value -> headers.putAll(validateAMQPHeaderProperty(value, headerSeparator)));
             }
         }
@@ -377,7 +377,7 @@ public class PublishAMQP extends AbstractAMQPProcessor<AMQPPublisher> {
             this.description = description;
         }
 
-        public static EnumSet<InputHeaderSource> getAllowedValues(){
+        public static EnumSet<InputHeaderSource> getAllowedValues() {
             return EnumSet.of(STRING, ATTRIBUTES, BOTH);
         }
 
