@@ -95,7 +95,7 @@ public class PutMongo extends AbstractMongoProcessor {
         .description("When true, inserts a document if no document matches the update query criteria; this property is valid only when using update mode, "
                 + "otherwise it is ignored")
         .required(true)
-        .dependsOn(MODE,MODE_UPDATE)
+        .dependsOn(MODE, MODE_UPDATE)
         .allowableValues("true", "false")
         .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
         .defaultValue("false")
@@ -104,7 +104,7 @@ public class PutMongo extends AbstractMongoProcessor {
         .name("Update Query Key")
         .description("Comma separated key names used to build the update query criteria. Their values are taken from incoming flowfile. Example: _id")
         .required(false)
-        .dependsOn(MODE,MODE_UPDATE)
+        .dependsOn(MODE, MODE_UPDATE)
         .addValidator(StandardValidators.NON_BLANK_VALIDATOR)
         .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
         .build();
@@ -114,7 +114,7 @@ public class PutMongo extends AbstractMongoProcessor {
         .description("Specify a full MongoDB query to be used for the lookup query to do an update/upsert. NOTE: this field is ignored if the '%s' value is not empty."
             .formatted(UPDATE_QUERY_KEY.getDisplayName()))
         .required(false)
-        .dependsOn(MODE,MODE_UPDATE)
+        .dependsOn(MODE, MODE_UPDATE)
         .addValidator(JsonValidator.INSTANCE)
         .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
         .build();
@@ -123,7 +123,7 @@ public class PutMongo extends AbstractMongoProcessor {
         .displayName("Update Mode")
         .name("put-mongo-update-mode")
         .required(true)
-        .dependsOn(MODE,MODE_UPDATE)
+        .dependsOn(MODE, MODE_UPDATE)
         .allowableValues(UPDATE_WITH_DOC, UPDATE_WITH_OPERATORS)
         .defaultValue(UPDATE_WITH_DOC)
         .description("Choose an update mode. You can either supply a JSON document to use as a direct replacement " +
@@ -135,7 +135,7 @@ public class PutMongo extends AbstractMongoProcessor {
     static final PropertyDescriptor MONGO_UPDATE_MODE = new PropertyDescriptor.Builder()
         .name("Mongo Update Query Mode")
         .displayName("Mongo Update Query Mode")
-        .dependsOn(UPDATE_OPERATION_MODE,UPDATE_WITH_OPERATORS)
+        .dependsOn(UPDATE_OPERATION_MODE, UPDATE_WITH_OPERATORS)
         .description("Choose between 'updateOne' or 'updateMany' Mongo documents per incoming flow file.")
         .allowableValues(MongoUpdateOption.class)
         .defaultValue(MongoUpdateOption.UPDATE_ONE)
@@ -229,7 +229,7 @@ public class PutMongo extends AbstractMongoProcessor {
 
             if (MODE_INSERT.equals(processorMode)) {
                 collection.insertOne((Document) doc);
-                logger.info("inserted {} into MongoDB", new Object[] { flowFile });
+                logger.info("inserted {} into MongoDB", new Object[] {flowFile});
             } else {
                 // update
                 final boolean upsert = context.getProperty(UPSERT).asBoolean();

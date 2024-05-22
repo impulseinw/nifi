@@ -169,7 +169,7 @@ public class PutMongoIT extends MongoWriteTestBase {
         runner.setProperty(PutMongo.UPDATE_QUERY, "${mongo.update.query}");
         runner.setValidateExpressionUsage(true);
         runner.enqueue(updateBody.toJson(), attr);
-        updateManyTests(runner, search,2);
+        updateManyTests(runner, search, 2);
     }
 
     @Test
@@ -227,7 +227,7 @@ public class PutMongoIT extends MongoWriteTestBase {
         runner.setProperty(PutMongo.MODE, PutMongo.MODE_UPDATE);
         runner.setValidateExpressionUsage(true);
         runner.enqueue(updateBody.toJson());
-        updateManyTests(runner,search,2);
+        updateManyTests(runner, search, 2);
     }
 
     @Test
@@ -252,9 +252,9 @@ public class PutMongoIT extends MongoWriteTestBase {
         collection.insertOne(document);
         Document updateBody = new Document(Map.of(
             "name", "John Smith",
-            "department","Engineering",
+            "department", "Engineering",
             "contacts", Map.of(
-                "phone","555-555-5555",
+                "phone", "555-555-5555",
                 "email", "john.smith@test.com",
                 "twitter", "@JohnSmith"
             )
@@ -269,8 +269,8 @@ public class PutMongoIT extends MongoWriteTestBase {
 
         MockFlowFile out = runner.getFlowFilesForRelationship(PutMongo.REL_SUCCESS).getFirst();
         out.assertAttributeNotExists(PutMongo.ATTRIBUTE_UPSERT_ID);
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT,String.valueOf(1));
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT,String.valueOf(1));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT, String.valueOf(1));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT, String.valueOf(1));
 
         MongoCursor<Document> cursor = collection.find(document).iterator();
         Document found = cursor.next();
@@ -314,8 +314,8 @@ public class PutMongoIT extends MongoWriteTestBase {
 
         MockFlowFile out = runner.getFlowFilesForRelationship(PutMongo.REL_SUCCESS).getFirst();
         out.assertAttributeNotExists(PutMongo.ATTRIBUTE_UPSERT_ID);
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT,String.valueOf(1));
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT,String.valueOf(1));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT, String.valueOf(1));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT, String.valueOf(1));
 
         MongoCursor<Document> iterator = collection.find(new Document("name", "John Smith")).iterator();
         assertTrue(iterator.hasNext(), "Document did not come back.");
@@ -360,23 +360,23 @@ public class PutMongoIT extends MongoWriteTestBase {
 
         MockFlowFile out = runner.getFlowFilesForRelationship(PutMongo.REL_SUCCESS).getFirst();
         out.assertAttributeNotExists(PutMongo.ATTRIBUTE_UPSERT_ID);
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT,String.valueOf(2));
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT,String.valueOf(2));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT, String.valueOf(2));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT, String.valueOf(2));
 
         MongoCursor<Document> iterator = collection.find(new Document("name", "John Smith")).iterator();
         for (int i = 1; i <= 2; i++) {
             assertTrue(iterator.hasNext(), "Document %d did not come back.".formatted(i));
             Document val = iterator.next();
-            Map contacts = (Map)val.get("contacts");
+            Map contacts = (Map) val.get("contacts");
             assertNotNull(contacts, "Document %d's contacts null".formatted(i));
-            assertTrue(contacts.containsKey("twitter") && contacts.get("twitter").equals("@JohnSmith"),"Document %d's twitter invalid".formatted(i));
-            assertTrue(val.containsKey("writes") && val.get("writes").equals(1),"Document %d's writes invalid".formatted(i));
+            assertTrue(contacts.containsKey("twitter") && contacts.get("twitter").equals("@JohnSmith"), "Document %d's twitter invalid".formatted(i));
+            assertTrue(val.containsKey("writes") && val.get("writes").equals(1), "Document %d's writes invalid".formatted(i));
 
         }
     }
 
     private void updateOneTests(TestRunner runner, Document document) {
-        updateManyTests(runner,document,1);
+        updateManyTests(runner, document, 1);
     }
 
     private void updateManyTests(TestRunner runner, Document document, int updateCount) {
@@ -386,8 +386,8 @@ public class PutMongoIT extends MongoWriteTestBase {
         MongoCursor<Document> iterator = collection.find(document).iterator();
         MockFlowFile out = runner.getFlowFilesForRelationship(PutMongo.REL_SUCCESS).getFirst();
         out.assertAttributeNotExists(PutMongo.ATTRIBUTE_UPSERT_ID);
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT,String.valueOf(updateCount));
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT,String.valueOf(updateCount));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT, String.valueOf(updateCount));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT, String.valueOf(updateCount));
         for (int i = 1; i <= updateCount; i++) {
             assertTrue(iterator.hasNext(), "Document number %s did not come back.".formatted(i));
             Document val = iterator.next();
@@ -481,8 +481,8 @@ public class PutMongoIT extends MongoWriteTestBase {
         MockFlowFile out = runner.getFlowFilesForRelationship(PutMongo.REL_SUCCESS).get(0);
         out.assertContentEquals(bytes);
         out.assertAttributeNotExists(PutMongo.ATTRIBUTE_UPSERT_ID);
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT,String.valueOf(0));
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT,String.valueOf(0));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT, String.valueOf(0));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT, String.valueOf(0));
 
         // nothing was in collection, so nothing to update since upsert defaults to false
         assertEquals(0, collection.countDocuments());
@@ -509,8 +509,8 @@ public class PutMongoIT extends MongoWriteTestBase {
         out.assertContentEquals(bytes);
 
         out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPSERT_ID, doc.getString("_id"));
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT,String.valueOf(0));
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT,String.valueOf(0));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT, String.valueOf(0));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT, String.valueOf(0));
 
         // verify 1 doc inserted into the collection
         assertEquals(1, collection.countDocuments());
@@ -532,9 +532,9 @@ public class PutMongoIT extends MongoWriteTestBase {
         MockFlowFile out = runner.getFlowFilesForRelationship(PutMongo.REL_SUCCESS).get(0);
         out.assertContentEquals(bytes);
 
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPSERT_ID,oidDocument.getObjectId("_id").toString());
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT,String.valueOf(0));
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT,String.valueOf(0));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPSERT_ID, oidDocument.getObjectId("_id").toString());
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT, String.valueOf(0));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT, String.valueOf(0));
 
         // verify 1 doc inserted into the collection
         assertEquals(1, collection.countDocuments());
@@ -565,8 +565,8 @@ public class PutMongoIT extends MongoWriteTestBase {
         MockFlowFile out = runner.getFlowFilesForRelationship(PutMongo.REL_SUCCESS).get(0);
         out.assertContentEquals(bytes);
         out.assertAttributeNotExists(PutMongo.ATTRIBUTE_UPSERT_ID);
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT,String.valueOf(1));
-        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT,String.valueOf(1));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MODIFY_COUNT, String.valueOf(1));
+        out.assertAttributeEquals(PutMongo.ATTRIBUTE_UPDATE_MATCH_COUNT, String.valueOf(1));
         assertEquals(1, collection.countDocuments());
         assertEquals(doc, collection.find().first());
     }
@@ -595,7 +595,7 @@ public class PutMongoIT extends MongoWriteTestBase {
         runner.assertTransferCount(PutMongo.REL_SUCCESS, 3);
         List<MockFlowFile> flowFilesForRelationship = runner.getFlowFilesForRelationship(PutMongo.REL_SUCCESS);
         MockFlowFile upsertOutput = flowFilesForRelationship.removeFirst();
-        upsertOutput.assertAttributeEquals(PutMongo.ATTRIBUTE_UPSERT_ID,"Test");
+        upsertOutput.assertAttributeEquals(PutMongo.ATTRIBUTE_UPSERT_ID, "Test");
 
         // test next flow files for update attributes
         for (int i = 0; i < flowFilesForRelationship.size(); i++) {
