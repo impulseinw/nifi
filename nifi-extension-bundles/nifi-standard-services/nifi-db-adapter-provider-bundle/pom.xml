@@ -24,11 +24,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>nifi-db-adapter-nar</module>
-        <module>nifi-generic-db-adapter-provider</module>
-        <module>nifi-oracle-db-adapter-provider</module>
-        <module>nifi-mssql-db-adapter-provider</module>
-        <module>nifi-mysql-db-adapter-provider</module>
-        <module>nifi-postgresql-db-adapter-provider</module>
-        <module>nifi-phoenix-db-adapter-provider</module>
+        <module>nifi-db-adapter</module>
     </modules>
 </project>

@@ -17,11 +17,12 @@
 package org.apache.nifi.migration;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
 import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.GENERIC_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
-import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.MSSQL_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
+import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.LEGACY_ORACLE_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
+import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.MSSQL_2008_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
+import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.MSSQL_2012_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
 import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.MYSQL_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
-import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.ORACLE_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
+import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.ORACLE_12_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
 import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.PHOENIX_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
 import static org.apache.nifi.migration.DatabaseAdapterProviderMigration.POSTGRESQL_DATABASE_ADAPTER_PROVIDER_CLASSNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +49,7 @@ class DatabaseAdapterProviderMigrationTest {
 
     @ParameterizedTest
     @MethodSource("provideArgs")
-    void testMigrateDatabaseTypeProperty(String serviceClassname, String dbType, boolean specifyDbType) {
+    void testMigrateDatabaseTypeProperty(String serviceClassname, String dbType) {
         final Map<String, String> properties = Map.of(
                 DB_TYPE, dbType
         );
@@ -64,26 +65,22 @@ class DatabaseAdapterProviderMigrationTest {
 
         final CreatedControllerService createdService = result.getCreatedControllerServices().iterator().next();
 
-        assertEquals(config.getRawPropertyValue(DATABASE_ADAPTER_PROVIDER).get(), createdService.id());
+        assertEquals(config.getRawPropertyValue(DATABASE_ADAPTER_PROVIDER).orElseThrow(), createdService.id());
         assertEquals(serviceClassname, createdService.implementationClassName());
 
-        if (specifyDbType) {
-            assertEquals(singletonMap(DB_TYPE, dbType), createdService.serviceProperties());
-        } else {
-            assertEquals(emptyMap(), createdService.serviceProperties());
-        }
+        assertEquals(emptyMap(), createdService.serviceProperties());
     }
 
     private static Stream<Arguments> provideArgs() {
         return Stream.of(
-                Arguments.of(GENERIC_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "Generic", false),
-                Arguments.of(MSSQL_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "MS SQL 2012+", true),
-                Arguments.of(MSSQL_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "MS SQL 2008", true),
-                Arguments.of(MYSQL_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "MySQL", false),
-                Arguments.of(ORACLE_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "Oracle", true),
-                Arguments.of(ORACLE_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "Oracle 12+", true),
-                Arguments.of(PHOENIX_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "Phoenix", false),
-                Arguments.of(POSTGRESQL_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "PostgreSQL", false)
+                Arguments.of(GENERIC_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "Generic"),
+                Arguments.of(MSSQL_2012_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "MS SQL 2012+"),
+                Arguments.of(MSSQL_2008_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "MS SQL 2008"),
+                Arguments.of(MYSQL_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "MySQL"),
+                Arguments.of(LEGACY_ORACLE_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "Oracle"),
+                Arguments.of(ORACLE_12_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "Oracle 12+"),
+                Arguments.of(PHOENIX_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "Phoenix"),
+                Arguments.of(POSTGRESQL_DATABASE_ADAPTER_PROVIDER_CLASSNAME, "PostgreSQL")
         );
     }
 }
