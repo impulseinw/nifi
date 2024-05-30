@@ -16,8 +16,8 @@
  */
 package org.apache.nifi.db.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.nifi.db.DatabaseAdapter;
+import org.apache.nifi.util.StringUtils;
 
 /**
  * A generic database adapter that generates ANSI SQL.

@@ -19,9 +19,9 @@ package org.apache.nifi.db.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.nifi.db.ColumnDescription;
 import org.apache.nifi.db.DatabaseAdapter;
+import org.apache.nifi.util.StringUtils;
 
 /**
  * A database adapter that generates MS SQL Compatible SQL.

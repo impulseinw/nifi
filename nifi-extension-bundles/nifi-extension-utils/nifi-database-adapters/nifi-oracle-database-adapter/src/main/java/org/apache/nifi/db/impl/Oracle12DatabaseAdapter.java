@@ -39,10 +39,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.nifi.db.ColumnDescription;
 import org.apache.nifi.db.DatabaseAdapter;
 import org.apache.nifi.db.TableSchema;
+import org.apache.nifi.util.StringUtils;
 
 public class Oracle12DatabaseAdapter implements DatabaseAdapter {
     @Override

@@ -37,10 +37,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.nifi.db.ColumnDescription;
 import org.apache.nifi.db.DatabaseAdapter;
 import org.apache.nifi.db.TableSchema;
+import org.apache.nifi.util.StringUtils;
 
 /**
  * A DatabaseAdapter that generates Oracle-compliant SQL.

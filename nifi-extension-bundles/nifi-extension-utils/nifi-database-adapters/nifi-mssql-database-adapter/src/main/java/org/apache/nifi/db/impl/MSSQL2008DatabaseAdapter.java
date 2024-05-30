@@ -16,7 +16,7 @@
  */
 package org.apache.nifi.db.impl;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.nifi.util.StringUtils;
 
 /**
  * A database adapter that generates MS SQL Compatible SQL for version 2008.
