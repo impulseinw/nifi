@@ -46,7 +46,6 @@ import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.components.Validator;
 import org.apache.nifi.db.ColumnDescription;
 import org.apache.nifi.db.DatabaseAdapter;
-import org.apache.nifi.db.DatabaseAdapterProvider;
 import org.apache.nifi.db.TableNotFoundException;
 import org.apache.nifi.db.TableSchema;
 import org.apache.nifi.dbcp.DBCPService;
@@ -54,7 +53,7 @@ import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.flowfile.attributes.CoreAttributes;
 import org.apache.nifi.logging.ComponentLog;
-import org.apache.nifi.migration.DatabaseAdapterProviderMigration;
+import org.apache.nifi.migration.DatabaseAdapterMigration;
 import org.apache.nifi.migration.PropertyConfiguration;
 import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
@@ -235,11 +234,11 @@ public class UpdateDatabaseTable extends AbstractProcessor {
             .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .build();
 
-    static final PropertyDescriptor DATABASE_ADAPTER_PROVIDER = new Builder()
+    static final PropertyDescriptor DATABASE_ADAPTER = new Builder()
             .name("db-adapter-provider")
             .displayName("Database Adapter Provider")
             .description("The service, that is used for generating database-specific code.")
-            .identifiesControllerService(DatabaseAdapterProvider.class)
+            .identifiesControllerService(DatabaseAdapter.class)
             .required(true)
             .build();
 
@@ -266,7 +265,7 @@ public class UpdateDatabaseTable extends AbstractProcessor {
         final List<PropertyDescriptor> pds = new ArrayList<>();
         pds.add(RECORD_READER);
         pds.add(DBCP_SERVICE);
-        pds.add(DATABASE_ADAPTER_PROVIDER);
+        pds.add(DATABASE_ADAPTER);
         pds.add(CATALOG_NAME);
         pds.add(SCHEMA_NAME);
         pds.add(TABLE_NAME);
@@ -284,7 +283,7 @@ public class UpdateDatabaseTable extends AbstractProcessor {
     @Override
     public void migrateProperties(final PropertyConfiguration config) {
         super.migrateProperties(config);
-        DatabaseAdapterProviderMigration.migrateProperties(config, DATABASE_ADAPTER_PROVIDER, "db-type");
+        DatabaseAdapterMigration.migrateProperties(config, DATABASE_ADAPTER, "db-type");
     }
 
     @Override
@@ -308,8 +307,7 @@ public class UpdateDatabaseTable extends AbstractProcessor {
                     .explanation("Record Writer must be set if 'Update Field Names' is true").valid(false).build());
         }
 
-        final DatabaseAdapter databaseAdapter = validationContext.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(
-                DatabaseAdapterProvider.class).getAdapter();
+        final DatabaseAdapter databaseAdapter = validationContext.getProperty(DATABASE_ADAPTER).asControllerService(DatabaseAdapter.class);
         final boolean createIfNotExists = CREATE_IF_NOT_EXISTS.getValue().equals(validationContext.getProperty(CREATE_TABLE).getValue());
         if (createIfNotExists && !databaseAdapter.supportsCreateTableIfNotExists()) {
             validationResults.add(new ValidationResult.Builder().subject(CREATE_TABLE.getDisplayName())
@@ -373,8 +371,7 @@ public class UpdateDatabaseTable extends AbstractProcessor {
                 throw new ProcessException("Record Writer must be set if 'Update Field Names' is true");
             }
             final DBCPService dbcpService = context.getProperty(DBCP_SERVICE).asControllerService(DBCPService.class);
-            final DatabaseAdapter databaseAdapter = context.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(
-                    DatabaseAdapterProvider.class).getAdapter();
+            final DatabaseAdapter databaseAdapter = context.getProperty(DATABASE_ADAPTER).asControllerService(DatabaseAdapter.class);
             try (final Connection connection = dbcpService.getConnection(flowFile.getAttributes())) {
                 final boolean quoteTableName = context.getProperty(QUOTE_TABLE_IDENTIFIER).asBoolean();
                 final boolean quoteColumnNames = context.getProperty(QUOTE_COLUMN_IDENTIFIERS).asBoolean();

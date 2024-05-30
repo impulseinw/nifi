@@ -71,12 +71,11 @@ import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.db.ColumnDescription;
 import org.apache.nifi.db.DatabaseAdapter;
-import org.apache.nifi.db.DatabaseAdapterProvider;
 import org.apache.nifi.db.TableSchema;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.logging.ComponentLog;
-import org.apache.nifi.migration.DatabaseAdapterProviderMigration;
+import org.apache.nifi.migration.DatabaseAdapterMigration;
 import org.apache.nifi.migration.PropertyConfiguration;
 import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
@@ -393,7 +392,7 @@ public class PutDatabaseRecord extends AbstractProcessor {
             .name("db-adapter-provider")
             .displayName("Database Adapter Provider")
             .description("The service, that is used for generating database-specific code.")
-            .identifiesControllerService(DatabaseAdapterProvider.class)
+            .identifiesControllerService(DatabaseAdapter.class)
             .required(true)
             .build();
 
@@ -442,7 +441,7 @@ public class PutDatabaseRecord extends AbstractProcessor {
     @Override
     public void migrateProperties(final PropertyConfiguration config) {
         super.migrateProperties(config);
-        DatabaseAdapterProviderMigration.migrateProperties(config, DATABASE_ADAPTER_PROVIDER, "db-type");
+        DatabaseAdapterMigration.migrateProperties(config, DATABASE_ADAPTER_PROVIDER, "db-type");
     }
 
     @Override
@@ -459,8 +458,7 @@ public class PutDatabaseRecord extends AbstractProcessor {
     protected Collection<ValidationResult> customValidate(ValidationContext validationContext) {
         Collection<ValidationResult> validationResults = new ArrayList<>(super.customValidate(validationContext));
 
-        DatabaseAdapter databaseAdapter = validationContext.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(
-                DatabaseAdapterProvider.class).getAdapter();
+        DatabaseAdapter databaseAdapter = validationContext.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(DatabaseAdapter.class);
         String statementType = validationContext.getProperty(STATEMENT_TYPE).getValue();
         if ((UPSERT_TYPE.equals(statementType) && !databaseAdapter.supportsUpsert())
             || (INSERT_IGNORE_TYPE.equals(statementType) && !databaseAdapter.supportsInsertIgnore())) {
@@ -509,7 +507,7 @@ public class PutDatabaseRecord extends AbstractProcessor {
 
     @OnScheduled
     public void onScheduled(final ProcessContext context) {
-        databaseAdapter = context.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(DatabaseAdapterProvider.class).getAdapter();
+        databaseAdapter = context.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(DatabaseAdapter.class);
 
         final int tableSchemaCacheSize = context.getProperty(TABLE_SCHEMA_CACHE_SIZE).asInteger();
         schemaCache = Caffeine.newBuilder()

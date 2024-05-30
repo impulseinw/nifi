@@ -41,8 +41,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.controller.ConfigurationContext;
-import org.apache.nifi.db.DatabaseAdapterProvider;
-import org.apache.nifi.db.GenericDatabaseAdapterProvider;
+import org.apache.nifi.db.DatabaseAdapter;
+import org.apache.nifi.db.GenericDatabaseAdapter;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.logging.ComponentLog;
 import org.apache.nifi.reporting.InitializationException;
@@ -76,8 +76,8 @@ public class TestDatabaseParameterProvider {
         final DatabaseParameterProvider rawProvider = new DatabaseParameterProvider();
         initializationContext = new MockParameterProviderInitializationContext("id", "name", mock(ComponentLog.class));
         initializationContext.addControllerService(dbcpService, DBCP_SERVICE);
-        final DatabaseAdapterProvider dbAdapterProvider = new GenericDatabaseAdapterProvider();
-        initializationContext.addControllerService(dbAdapterProvider, DATABASE_ADAPTER_PROVIDER.getName());
+        final DatabaseAdapter dbAdapter = new GenericDatabaseAdapter();
+        initializationContext.addControllerService(dbAdapter, DATABASE_ADAPTER_PROVIDER.getName());
         rawProvider.initialize(initializationContext);
         parameterProvider = spy(rawProvider);
         // Return the table name
@@ -86,7 +86,7 @@ public class TestDatabaseParameterProvider {
         columnBasedProperties = new HashMap<>();
 
         columnBasedProperties.put(DatabaseParameterProvider.DBCP_SERVICE, DBCP_SERVICE);
-        columnBasedProperties.put(DATABASE_ADAPTER_PROVIDER, dbAdapterProvider.getIdentifier());
+        columnBasedProperties.put(DATABASE_ADAPTER_PROVIDER, dbAdapter.getIdentifier());
         columnBasedProperties.put(DatabaseParameterProvider.PARAMETER_GROUPING_STRATEGY, DatabaseParameterProvider.GROUPING_BY_COLUMN.getValue());
         columnBasedProperties.put(DatabaseParameterProvider.PARAMETER_GROUP_NAME_COLUMN, "group");
         columnBasedProperties.put(DatabaseParameterProvider.PARAMETER_NAME_COLUMN, "name");
@@ -95,7 +95,7 @@ public class TestDatabaseParameterProvider {
 
         nonColumnBasedProperties = new HashMap<>();
         nonColumnBasedProperties.put(DatabaseParameterProvider.DBCP_SERVICE, DBCP_SERVICE);
-        nonColumnBasedProperties.put(DATABASE_ADAPTER_PROVIDER, dbAdapterProvider.getIdentifier());
+        nonColumnBasedProperties.put(DATABASE_ADAPTER_PROVIDER, dbAdapter.getIdentifier());
         nonColumnBasedProperties.put(DatabaseParameterProvider.PARAMETER_GROUPING_STRATEGY, DatabaseParameterProvider.GROUPING_BY_TABLE_NAME.getValue());
         nonColumnBasedProperties.put(DatabaseParameterProvider.PARAMETER_NAME_COLUMN, "name");
         nonColumnBasedProperties.put(DatabaseParameterProvider.PARAMETER_VALUE_COLUMN, "value");

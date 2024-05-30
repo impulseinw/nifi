@@ -51,13 +51,11 @@ import org.apache.nifi.components.state.Scope;
 import org.apache.nifi.components.state.StateManager;
 import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.db.DatabaseAdapter;
-import org.apache.nifi.db.DatabaseAdapterProvider;
-import org.apache.nifi.db.GenericDatabaseAdapterProvider;
-import org.apache.nifi.db.impl.GenericDatabaseAdapter;
-import org.apache.nifi.db.impl.MSSQLDatabaseAdapter;
-import org.apache.nifi.db.impl.MySQLDatabaseAdapter;
-import org.apache.nifi.db.impl.OracleDatabaseAdapter;
-import org.apache.nifi.db.impl.PhoenixDatabaseAdapter;
+import org.apache.nifi.db.GenericDatabaseAdapter;
+import org.apache.nifi.db.MSSQL2012DatabaseAdapter;
+import org.apache.nifi.db.MySQLDatabaseAdapter;
+import org.apache.nifi.db.LegacyOracleDatabaseAdapter;
+import org.apache.nifi.db.PhoenixDatabaseAdapter;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.reporting.InitializationException;
@@ -115,8 +113,8 @@ public class QueryDatabaseTableTest {
         System.clearProperty("derby.stream.error.file");
     }
 
-    public DatabaseAdapterProvider createDatabaseAdapterProvider() {
-        return new GenericDatabaseAdapterProvider();
+    public DatabaseAdapter createDatabaseAdapter() {
+        return new GenericDatabaseAdapter();
     }
 
     public void createDbcpControllerService() throws InitializationException {
@@ -127,9 +125,9 @@ public class QueryDatabaseTableTest {
     }
 
     public void createDbAdapterControllerService() throws InitializationException {
-        final DatabaseAdapterProvider dbAdapterProvider = createDatabaseAdapterProvider();
-        runner.addControllerService("dbAdapterProvider", dbAdapterProvider);
-        runner.enableControllerService(dbAdapterProvider);
+        final DatabaseAdapter dbAdapter = createDatabaseAdapter();
+        runner.addControllerService("dbAdapter", dbAdapter);
+        runner.enableControllerService(dbAdapter);
     }
 
     @BeforeEach
@@ -139,7 +137,7 @@ public class QueryDatabaseTableTest {
         createDbcpControllerService();
         runner.setProperty(QueryDatabaseTable.DBCP_SERVICE, "dbcp");
         createDbAdapterControllerService();
-        runner.setProperty(QueryDatabaseTable.DATABASE_ADAPTER_PROVIDER, "dbAdapterProvider");
+        runner.setProperty(QueryDatabaseTable.DATABASE_ADAPTER, "dbAdapter");
         runner.getStateManager().clear(Scope.CLUSTER);
     }
 
@@ -151,7 +149,7 @@ public class QueryDatabaseTableTest {
 
     @Test
     public void testGetQuery() throws Exception {
-        dbAdapter = createDatabaseAdapterProvider().getAdapter();
+        dbAdapter = createDatabaseAdapter();
         String query = processor.getQuery(dbAdapter, "myTable", null, null, null, null);
         assertEquals("SELECT * FROM myTable", query);
         query = processor.getQuery(dbAdapter, "myTable", "col1,col2", null, null, null);
@@ -188,13 +186,13 @@ public class QueryDatabaseTableTest {
         assertEquals("SELECT * FROM `myTable` WHERE id > 509 AND `DATE-CREATED` >= '2016-03-07 12:34:56'", query);
 
         // Square brackets can be used to escape Microsoft SQL Server column and table names.
-        dbAdapter = new MSSQLDatabaseAdapter();
+        dbAdapter = new MSSQL2012DatabaseAdapter();
         processor.putColumnType(processor.getStateKey("[myTable]", "[DATE-CREATED]", dbAdapter), Types.TIMESTAMP);
         query = processor.getQuery(dbAdapter, "[myTable]", null, Arrays.asList("id", "[DATE-CREATED]"), null, stateManager.getState(Scope.CLUSTER).toMap());
         assertEquals("SELECT * FROM [myTable] WHERE id > 509 AND [DATE-CREATED] >= '2016-03-07 12:34:56'", query);
 
         // Test Oracle strategy
-        dbAdapter = new OracleDatabaseAdapter();
+        dbAdapter = new LegacyOracleDatabaseAdapter();
         query = processor.getQuery(dbAdapter, "myTable", null, Arrays.asList("id", "DATE_CREATED"), "type = \"CUSTOMER\"", stateManager.getState(Scope.CLUSTER).toMap());
         assertEquals("SELECT * FROM myTable WHERE id > 509 AND DATE_CREATED >= timestamp '2016-03-07 12:34:56' AND (type = \"CUSTOMER\")", query);
 
@@ -702,17 +700,11 @@ public class QueryDatabaseTableTest {
         runner.setProperty(QueryDatabaseTable.TABLE_NAME, "TEST_NULL_INT");
         runner.setProperty(AbstractDatabaseFetchProcessor.MAX_VALUE_COLUMN_NAMES, "id");
 
-        final DatabaseAdapter throwingDbAdapter = new GenericDatabaseAdapter() {
-            @Override
-            public String getName() {
-                throw new DataFileWriter.AppendWriteException(null);
-            }
-        };
-        final DatabaseAdapterProvider provider = spy(createDatabaseAdapterProvider());
-        when(provider.getAdapter()).thenReturn(throwingDbAdapter);
+        final DatabaseAdapter provider = spy(createDatabaseAdapter());
+        when(provider.getName()).thenThrow(new DataFileWriter.AppendWriteException(null));
         runner.addControllerService("ThrowingDbAdapter", provider);
         runner.enableControllerService(provider);
-        runner.setProperty(QueryDatabaseTable.DATABASE_ADAPTER_PROVIDER, provider.getIdentifier());
+        runner.setProperty(QueryDatabaseTable.DATABASE_ADAPTER, provider.getIdentifier());
 
         runner.run();
 
@@ -1508,11 +1500,11 @@ public class QueryDatabaseTableTest {
                 throw new DataFileWriter.AppendWriteException(null);
             }
         };
-        final DatabaseAdapterProvider provider = spy(createDatabaseAdapterProvider());
-        when(provider.getAdapter()).thenReturn(throwingDbAdapter);
+        final DatabaseAdapter provider = spy(createDatabaseAdapter());
+        when(provider.getName()).thenCallRealMethod().thenThrow(new DataFileWriter.AppendWriteException(null));
         runner.addControllerService("ThrowingDbAdapter", provider);
         runner.enableControllerService(provider);
-        runner.setProperty(QueryDatabaseTable.DATABASE_ADAPTER_PROVIDER, provider.getIdentifier());
+        runner.setProperty(QueryDatabaseTable.DATABASE_ADAPTER, provider.getIdentifier());
 
         runner.run();
         assertTrue(runner.getFlowFilesForRelationship(QueryDatabaseTable.REL_SUCCESS).isEmpty());
@@ -1520,11 +1512,10 @@ public class QueryDatabaseTableTest {
         runner.getStateManager().assertStateNotSet("test_null_int@!@id", Scope.CLUSTER);
 
         // Restore original (working) adapter and run again
-        final DatabaseAdapterProvider provider2 = spy(createDatabaseAdapterProvider());
-        when(provider.getAdapter()).thenReturn(new GenericDatabaseAdapter());
+        final DatabaseAdapter provider2 = spy(createDatabaseAdapter());
         runner.addControllerService("DbAdapter", provider2);
         runner.enableControllerService(provider2);
-        runner.setProperty(QueryDatabaseTable.DATABASE_ADAPTER_PROVIDER, provider2.getIdentifier());
+        runner.setProperty(QueryDatabaseTable.DATABASE_ADAPTER, provider2.getIdentifier());
         runner.run();
         assertFalse(runner.getFlowFilesForRelationship(QueryDatabaseTable.REL_SUCCESS).isEmpty());
         runner.getStateManager().assertStateEquals("test_null_int@!@id", "2", Scope.CLUSTER);

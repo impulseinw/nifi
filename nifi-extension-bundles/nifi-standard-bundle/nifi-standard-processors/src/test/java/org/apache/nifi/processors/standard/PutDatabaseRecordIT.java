@@ -32,8 +32,8 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.nifi.db.DatabaseAdapterProvider;
-import org.apache.nifi.db.PostgreSQLDatabaseAdapterProvider;
+import org.apache.nifi.db.DatabaseAdapter;
+import org.apache.nifi.db.PostgreSQLDatabaseAdapter;
 import org.apache.nifi.dbcp.DBCPConnectionPool;
 import org.apache.nifi.dbcp.utils.DBCPProperties;
 import org.apache.nifi.json.JsonTreeReader;
@@ -83,9 +83,9 @@ public class PutDatabaseRecordIT {
 
         runner = TestRunners.newTestRunner(PutDatabaseRecord.class);
 
-        final DatabaseAdapterProvider dbAdapterProvider = new PostgreSQLDatabaseAdapterProvider();
-        runner.addControllerService("dbAdapterProvider", dbAdapterProvider);
-        runner.enableControllerService(dbAdapterProvider);
+        final DatabaseAdapter dbAdapter = new PostgreSQLDatabaseAdapter();
+        runner.addControllerService("dbAdapter", dbAdapter);
+        runner.enableControllerService(dbAdapter);
 
         final DBCPConnectionPool connectionPool = new DBCPConnectionPool();
         runner.addControllerService("connectionPool", connectionPool);
@@ -105,7 +105,7 @@ public class PutDatabaseRecordIT {
         runner.setProperty(PutDatabaseRecord.DBCP_SERVICE, "connectionPool");
 
         runner.setProperty(PutDatabaseRecord.TABLE_NAME, "person");
-        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER_PROVIDER, dbAdapterProvider.getIdentifier());
+        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER_PROVIDER, dbAdapter.getIdentifier());
         runner.setProperty(PutDatabaseRecord.STATEMENT_TYPE, "INSERT");
     }
 

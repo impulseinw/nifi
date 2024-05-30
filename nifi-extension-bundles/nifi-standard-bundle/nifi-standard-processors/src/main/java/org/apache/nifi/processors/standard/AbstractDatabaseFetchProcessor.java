@@ -75,12 +75,11 @@ import org.apache.nifi.components.PropertyDescriptor.Builder;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.db.DatabaseAdapter;
-import org.apache.nifi.db.DatabaseAdapterProvider;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.flowfile.attributes.FragmentAttributes;
-import org.apache.nifi.migration.DatabaseAdapterProviderMigration;
+import org.apache.nifi.migration.DatabaseAdapterMigration;
 import org.apache.nifi.migration.PropertyConfiguration;
 import org.apache.nifi.processor.AbstractSessionFactoryProcessor;
 import org.apache.nifi.processor.ProcessContext;
@@ -184,11 +183,11 @@ public abstract class AbstractDatabaseFetchProcessor extends AbstractSessionFact
     // The delimiter to use when referencing qualified names (such as table@!@column in the state map)
     protected static final String NAMESPACE_DELIMITER = "@!@";
 
-    public static final PropertyDescriptor DATABASE_ADAPTER_PROVIDER = new Builder()
+    public static final PropertyDescriptor DATABASE_ADAPTER = new Builder()
             .name("db-adapter-provider")
             .displayName("Database Adapter Provider")
             .description("The service, that is used for generating database-specific code.")
-            .identifiesControllerService(DatabaseAdapterProvider.class)
+            .identifiesControllerService(DatabaseAdapter.class)
             .required(true)
             .build();
 
@@ -225,7 +224,7 @@ public abstract class AbstractDatabaseFetchProcessor extends AbstractSessionFact
     @Override
     public void migrateProperties(final PropertyConfiguration config) {
         super.migrateProperties(config);
-        DatabaseAdapterProviderMigration.migrateProperties(config, DATABASE_ADAPTER_PROVIDER, "db-fetch-db-type");
+        DatabaseAdapterMigration.migrateProperties(config, DATABASE_ADAPTER, "db-fetch-db-type");
     }
 
     public void setup(final ProcessContext context) {
@@ -248,8 +247,7 @@ public abstract class AbstractDatabaseFetchProcessor extends AbstractSessionFact
             final String tableName = context.getProperty(TABLE_NAME).evaluateAttributeExpressions(flowFile).getValue();
             final String sqlQuery = context.getProperty(SQL_QUERY).evaluateAttributeExpressions().getValue();
 
-            final DatabaseAdapter dbAdapter = context.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(
-                    DatabaseAdapterProvider.class).getAdapter();
+            final DatabaseAdapter dbAdapter = context.getProperty(DATABASE_ADAPTER).asControllerService(DatabaseAdapter.class);
             try (final Connection con = dbcpService.getConnection(flowFile == null ? Collections.emptyMap() : flowFile.getAttributes());
                  final Statement st = con.createStatement()) {
 

@@ -17,7 +17,7 @@
 package org.apache.nifi.processors.standard;
 
 
-import static org.apache.nifi.processors.standard.AbstractDatabaseFetchProcessor.DATABASE_ADAPTER_PROVIDER;
+import static org.apache.nifi.processors.standard.AbstractDatabaseFetchProcessor.DATABASE_ADAPTER;
 import static org.apache.nifi.processors.standard.AbstractDatabaseFetchProcessor.FRAGMENT_COUNT;
 import static org.apache.nifi.processors.standard.AbstractDatabaseFetchProcessor.FRAGMENT_ID;
 import static org.apache.nifi.processors.standard.AbstractDatabaseFetchProcessor.FRAGMENT_INDEX;
@@ -49,9 +49,8 @@ import java.util.Set;
 import org.apache.nifi.components.state.Scope;
 import org.apache.nifi.components.state.StateManager;
 import org.apache.nifi.controller.AbstractControllerService;
-import org.apache.nifi.db.DatabaseAdapterProvider;
-import org.apache.nifi.db.GenericDatabaseAdapterProvider;
-import org.apache.nifi.db.impl.DerbyDatabaseAdapter;
+import org.apache.nifi.db.DatabaseAdapter;
+import org.apache.nifi.db.DerbyDatabaseAdapter;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.reporting.InitializationException;
@@ -112,21 +111,20 @@ public class TestGenerateTableFetch {
     @BeforeEach
     public void setUp() throws Exception {
         processor = new GenerateTableFetch();
-        final DatabaseAdapterProvider dbAdapterProvider = spy(new GenericDatabaseAdapterProvider());
-        when(dbAdapterProvider.getAdapter()).thenReturn(new DerbyDatabaseAdapter());
+        final DatabaseAdapter dbAdapter = spy(new DerbyDatabaseAdapter());
         //Mock the DBCP Controller Service so we can control the Results
         dbcp = spy(new DBCPServiceSimpleImpl());
 
         final Map<String, String> dbcpProperties = new HashMap<>();
 
         runner = TestRunners.newTestRunner(processor);
-        runner.addControllerService("dbAdapterProvider", dbAdapterProvider);
-        runner.enableControllerService(dbAdapterProvider);
-        runner.setProperty(GenerateTableFetch.DATABASE_ADAPTER_PROVIDER, "dbAdapterProvider");
+        runner.addControllerService("dbAdapter", dbAdapter);
+        runner.enableControllerService(dbAdapter);
+        runner.setProperty(GenerateTableFetch.DATABASE_ADAPTER, "dbAdapter");
         runner.addControllerService("dbcp", dbcp, dbcpProperties);
         runner.enableControllerService(dbcp);
         runner.setProperty(GenerateTableFetch.DBCP_SERVICE, "dbcp");
-        runner.setProperty(DATABASE_ADAPTER_PROVIDER, dbAdapterProvider.getIdentifier());
+        runner.setProperty(DATABASE_ADAPTER, dbAdapter.getIdentifier());
     }
 
     @Test

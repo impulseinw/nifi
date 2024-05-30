@@ -35,7 +35,6 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.PropertyDescriptor.Builder;
 import org.apache.nifi.controller.ConfigurationContext;
 import org.apache.nifi.db.DatabaseAdapter;
-import org.apache.nifi.db.DatabaseAdapterProvider;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.logging.ComponentLog;
 import org.apache.nifi.processor.util.StandardValidators;
@@ -52,7 +51,7 @@ public class DatabaseParameterProvider extends AbstractParameterProvider impleme
             .name("db-adapter-provider")
             .displayName("Database Adapter Provider")
             .description("The service, that is used for generating database-specific code.")
-            .identifiesControllerService(DatabaseAdapterProvider.class)
+            .identifiesControllerService(DatabaseAdapter.class)
             .required(true)
             .build();
 
@@ -219,7 +218,7 @@ public class DatabaseParameterProvider extends AbstractParameterProvider impleme
     }
 
     String getQuery(final ConfigurationContext context, final String tableName, final List<String> columns, final String whereClause) {
-        final DatabaseAdapter dbAdapter = context.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(DatabaseAdapterProvider.class).getAdapter();
+        final DatabaseAdapter dbAdapter = context.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(DatabaseAdapter.class);
         return dbAdapter.getSelectStatement(tableName, StringUtils.join(columns, ", "), whereClause, null, null, null);
     }
 

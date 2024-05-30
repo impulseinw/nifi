@@ -19,8 +19,8 @@ package org.apache.nifi.processors.standard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.apache.nifi.db.DatabaseAdapterProvider;
-import org.apache.nifi.db.PostgreSQLDatabaseAdapterProvider;
+import org.apache.nifi.db.DatabaseAdapter;
+import org.apache.nifi.db.PostgreSQLDatabaseAdapter;
 import org.apache.nifi.dbcp.DBCPConnectionPool;
 import org.apache.nifi.dbcp.utils.DBCPProperties;
 import org.apache.nifi.reporting.InitializationException;
@@ -48,8 +48,8 @@ public class QueryDatabaseTableRecordIT extends QueryDatabaseTableRecordTest {
     }
 
     @Override
-    public DatabaseAdapterProvider createDatabaseAdapterProvider() {
-        return new PostgreSQLDatabaseAdapterProvider();
+    public DatabaseAdapter createDatabaseAdapter() {
+        return new PostgreSQLDatabaseAdapter();
     }
 
     @Override
