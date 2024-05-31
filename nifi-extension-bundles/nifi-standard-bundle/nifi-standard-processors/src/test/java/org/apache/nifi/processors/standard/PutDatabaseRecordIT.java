@@ -105,7 +105,7 @@ public class PutDatabaseRecordIT {
         runner.setProperty(PutDatabaseRecord.DBCP_SERVICE, "connectionPool");
 
         runner.setProperty(PutDatabaseRecord.TABLE_NAME, "person");
-        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER_PROVIDER, dbAdapter.getIdentifier());
+        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER, dbAdapter.getIdentifier());
         runner.setProperty(PutDatabaseRecord.STATEMENT_TYPE, "INSERT");
     }
 

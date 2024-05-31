@@ -45,11 +45,9 @@ import org.apache.nifi.util.StringUtils;
 
 public class DatabaseParameterProvider extends AbstractParameterProvider implements VerifiableParameterProvider {
 
-    // TODO: There was no migration facility for Parameter Providers by the time of introducing this property,
-    //  and removing the old 'db-type'.
-    public static final PropertyDescriptor DATABASE_ADAPTER_PROVIDER = new Builder()
-            .name("db-adapter-provider")
-            .displayName("Database Adapter Provider")
+    public static final PropertyDescriptor DATABASE_ADAPTER = new Builder()
+            .name("db-adapter")
+            .displayName("Database Adapter")
             .description("The service, that is used for generating database-specific code.")
             .identifiesControllerService(DatabaseAdapter.class)
             .required(true)
@@ -133,7 +131,7 @@ public class DatabaseParameterProvider extends AbstractParameterProvider impleme
     @Override
     protected void init(final ParameterProviderInitializationContext config) {
         final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(DATABASE_ADAPTER_PROVIDER);
+        properties.add(DATABASE_ADAPTER);
         properties.add(DBCP_SERVICE);
         properties.add(PARAMETER_GROUPING_STRATEGY);
         properties.add(TABLE_NAME);
@@ -218,7 +216,7 @@ public class DatabaseParameterProvider extends AbstractParameterProvider impleme
     }
 
     String getQuery(final ConfigurationContext context, final String tableName, final List<String> columns, final String whereClause) {
-        final DatabaseAdapter dbAdapter = context.getProperty(DATABASE_ADAPTER_PROVIDER).asControllerService(DatabaseAdapter.class);
+        final DatabaseAdapter dbAdapter = context.getProperty(DATABASE_ADAPTER).asControllerService(DatabaseAdapter.class);
         return dbAdapter.getSelectStatement(tableName, StringUtils.join(columns, ", "), whereClause, null, null, null);
     }
 

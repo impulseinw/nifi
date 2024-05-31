@@ -200,7 +200,7 @@ public class PutDatabaseRecordTest {
         runner = TestRunners.newTestRunner(processor);
         runner.addControllerService("dbAdapter", dbAdapter);
         runner.enableControllerService(dbAdapter);
-        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER_PROVIDER, "dbAdapter");
+        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER, "dbAdapter");
         runner.addControllerService(DBCP_SERVICE_ID, dbcp, dbcpProperties);
         runner.enableControllerService(dbcp);
         runner.setProperty(PutDatabaseRecord.DBCP_SERVICE, DBCP_SERVICE_ID);
@@ -239,7 +239,7 @@ public class PutDatabaseRecordTest {
         final DatabaseAdapter dbAdapter = new GenericDatabaseAdapter();
         runner.addControllerService("dbAdapter", dbAdapter);
         runner.enableControllerService(dbAdapter);
-        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER_PROVIDER, dbAdapter.getIdentifier());
+        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER, dbAdapter.getIdentifier());
         runner.addControllerService(DBCP_SERVICE_ID, dbcp, dbcpProperties);
         runner.enableControllerService(dbcp);
         runner.setProperty(PutDatabaseRecord.DBCP_SERVICE, DBCP_SERVICE_ID);
@@ -286,7 +286,7 @@ public class PutDatabaseRecordTest {
         final DatabaseAdapter dbAdapter = new GenericDatabaseAdapter();
         runner.addControllerService("dbAdapter", dbAdapter);
         runner.enableControllerService(dbAdapter);
-        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER_PROVIDER, dbAdapter.getIdentifier());
+        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER, dbAdapter.getIdentifier());
         runner.addControllerService(DBCP_SERVICE_ID, dbcp, dbcpProperties);
         runner.enableControllerService(dbcp);
         runner.setProperty(PutDatabaseRecord.DBCP_SERVICE, DBCP_SERVICE_ID);
@@ -2159,7 +2159,7 @@ public class PutDatabaseRecordTest {
         final DatabaseAdapter dbAdapter = new GenericDatabaseAdapter();
         runner.addControllerService("dbAdapter", dbAdapter);
         runner.enableControllerService(dbAdapter);
-        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER_PROVIDER, dbAdapter.getIdentifier());
+        runner.setProperty(PutDatabaseRecord.DATABASE_ADAPTER, dbAdapter.getIdentifier());
         runner.addControllerService(DBCP_SERVICE_ID, dbcp, new HashMap<>());
         runner.enableControllerService(dbcp);
         runner.setProperty(PutDatabaseRecord.DBCP_SERVICE, DBCP_SERVICE_ID);

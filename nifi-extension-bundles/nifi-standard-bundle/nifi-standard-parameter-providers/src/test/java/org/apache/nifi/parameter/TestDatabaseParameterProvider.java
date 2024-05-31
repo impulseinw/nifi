@@ -15,7 +15,7 @@ package org.apache.nifi.parameter; /*
  * limitations under the License.
  */
 
-import static org.apache.nifi.parameter.DatabaseParameterProvider.DATABASE_ADAPTER_PROVIDER;
+import static org.apache.nifi.parameter.DatabaseParameterProvider.DATABASE_ADAPTER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -77,7 +77,7 @@ public class TestDatabaseParameterProvider {
         initializationContext = new MockParameterProviderInitializationContext("id", "name", mock(ComponentLog.class));
         initializationContext.addControllerService(dbcpService, DBCP_SERVICE);
         final DatabaseAdapter dbAdapter = new GenericDatabaseAdapter();
-        initializationContext.addControllerService(dbAdapter, DATABASE_ADAPTER_PROVIDER.getName());
+        initializationContext.addControllerService(dbAdapter, DATABASE_ADAPTER.getName());
         rawProvider.initialize(initializationContext);
         parameterProvider = spy(rawProvider);
         // Return the table name
@@ -86,7 +86,7 @@ public class TestDatabaseParameterProvider {
         columnBasedProperties = new HashMap<>();
 
         columnBasedProperties.put(DatabaseParameterProvider.DBCP_SERVICE, DBCP_SERVICE);
-        columnBasedProperties.put(DATABASE_ADAPTER_PROVIDER, dbAdapter.getIdentifier());
+        columnBasedProperties.put(DATABASE_ADAPTER, dbAdapter.getIdentifier());
         columnBasedProperties.put(DatabaseParameterProvider.PARAMETER_GROUPING_STRATEGY, DatabaseParameterProvider.GROUPING_BY_COLUMN.getValue());
         columnBasedProperties.put(DatabaseParameterProvider.PARAMETER_GROUP_NAME_COLUMN, "group");
         columnBasedProperties.put(DatabaseParameterProvider.PARAMETER_NAME_COLUMN, "name");
@@ -95,7 +95,7 @@ public class TestDatabaseParameterProvider {
 
         nonColumnBasedProperties = new HashMap<>();
         nonColumnBasedProperties.put(DatabaseParameterProvider.DBCP_SERVICE, DBCP_SERVICE);
-        nonColumnBasedProperties.put(DATABASE_ADAPTER_PROVIDER, dbAdapter.getIdentifier());
+        nonColumnBasedProperties.put(DATABASE_ADAPTER, dbAdapter.getIdentifier());
         nonColumnBasedProperties.put(DatabaseParameterProvider.PARAMETER_GROUPING_STRATEGY, DatabaseParameterProvider.GROUPING_BY_TABLE_NAME.getValue());
         nonColumnBasedProperties.put(DatabaseParameterProvider.PARAMETER_NAME_COLUMN, "name");
         nonColumnBasedProperties.put(DatabaseParameterProvider.PARAMETER_VALUE_COLUMN, "value");

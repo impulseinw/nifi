@@ -41,8 +41,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class DatabaseAdapterMigrationTest {
 
-    private static final PropertyDescriptor DATABASE_ADAPTER_PROVIDER = new PropertyDescriptor.Builder()
-            .name("db-adapter-provider")
+    private static final PropertyDescriptor DATABASE_ADAPTER = new PropertyDescriptor.Builder()
+            .name("db-adapter")
             .build();
 
     private static final String DB_TYPE = "db-type";
@@ -55,17 +55,17 @@ class DatabaseAdapterMigrationTest {
         );
         final MockPropertyConfiguration config = new MockPropertyConfiguration(properties);
 
-        DatabaseAdapterMigration.migrateProperties(config, DATABASE_ADAPTER_PROVIDER, DB_TYPE);
+        DatabaseAdapterMigration.migrateProperties(config, DATABASE_ADAPTER, DB_TYPE);
 
         assertFalse(config.hasProperty(DB_TYPE));
-        assertTrue(config.isPropertySet(DATABASE_ADAPTER_PROVIDER));
+        assertTrue(config.isPropertySet(DATABASE_ADAPTER));
 
         PropertyMigrationResult result = config.toPropertyMigrationResult();
         assertEquals(1, result.getCreatedControllerServices().size());
 
         final CreatedControllerService createdService = result.getCreatedControllerServices().iterator().next();
 
-        assertEquals(config.getRawPropertyValue(DATABASE_ADAPTER_PROVIDER).orElseThrow(), createdService.id());
+        assertEquals(config.getRawPropertyValue(DATABASE_ADAPTER).orElseThrow(), createdService.id());
         assertEquals(serviceClassname, createdService.implementationClassName());
 
         assertEquals(emptyMap(), createdService.serviceProperties());
