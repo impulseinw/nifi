@@ -184,8 +184,7 @@ public abstract class AbstractDatabaseFetchProcessor extends AbstractSessionFact
     protected static final String NAMESPACE_DELIMITER = "@!@";
 
     public static final PropertyDescriptor DATABASE_ADAPTER = new Builder()
-            .name("db-adapter")
-            .displayName("Database Adapter")
+            .name("Database Adapter")
             .description("The service, that is used for generating database-specific code.")
             .identifiesControllerService(DatabaseAdapter.class)
             .required(true)

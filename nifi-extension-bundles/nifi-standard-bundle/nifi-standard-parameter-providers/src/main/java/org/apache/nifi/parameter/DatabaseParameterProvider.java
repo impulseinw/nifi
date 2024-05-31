@@ -46,8 +46,7 @@ import org.apache.nifi.util.StringUtils;
 public class DatabaseParameterProvider extends AbstractParameterProvider implements VerifiableParameterProvider {
 
     public static final PropertyDescriptor DATABASE_ADAPTER = new Builder()
-            .name("db-adapter")
-            .displayName("Database Adapter")
+            .name("Database Adapter")
             .description("The service, that is used for generating database-specific code.")
             .identifiesControllerService(DatabaseAdapter.class)
             .required(true)

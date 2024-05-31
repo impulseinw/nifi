@@ -42,7 +42,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class DatabaseAdapterMigrationTest {
 
     private static final PropertyDescriptor DATABASE_ADAPTER = new PropertyDescriptor.Builder()
-            .name("db-adapter")
+            .name("Database Adapter")
             .build();
 
     private static final String DB_TYPE = "db-type";
