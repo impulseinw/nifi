@@ -69,6 +69,6 @@ public class QueryDatabaseTableRecordIT extends QueryDatabaseTableRecordTest {
         final AssertionError assertionError = assertThrows(AssertionError.class, super::testAddedRowsAutoCommitTrue);
         assertEquals(assertionError.getMessage(), "Processor has 1 validation failures:\n" +
                 "'Set Auto Commit' validated against 'true' is invalid because 'Set Auto Commit' " +
-                "must be set to 'false' because 'PostgreSQL' Database Adapter Provider requires it to be 'false'\n");
+                "must be set to 'false' because 'PostgreSQL' Database Adapter requires it to be 'false'\n");
     }
 }
